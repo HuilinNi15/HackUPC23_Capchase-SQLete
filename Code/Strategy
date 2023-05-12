@@ -2,6 +2,10 @@
 local target = nil
 local cooldowns = {0, 0, 0}
 
+function isLeft(a, b, c) -- a, b, c are vec2. Returns true if c is left of line ab, meaning the bullet doesn't affect the player
+    return ((b:vec():x() - a:vec():x()) * (c:vec():y() - a:vec():y()) - (b:vec():y() - a:vec():y()) * (c:vec():x() - a:vec():x())) > 0
+end
+
 -- Initialize bot
 function bot_init(me)
 

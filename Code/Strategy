@@ -58,12 +58,28 @@ function intersection(line1, line2)
     return Point:new(x, y)
 end
 
+-- Function to check for intersection between a circle and a line
+-- Returns true if there is an intersection, false otherwise
+function intersectionCircle(line, circleCenter)
+    -- Find the distance from the center of the circle to the line
+    local distance = math.abs(line.a * circleCenter.x + line.b * circleCenter.y + line.c) / math.sqrt(line.a * line.a + line.b * line.b)
+  
+    -- If the distance is greater than the radius of the circle, there is no intersection
+    if distance > 1 then
+      return false
+    end
+  
+    -- Otherwise, there is an intersection
+    return true
+  end
+  
 function fartherAlongLine(point1, point2, lineStart, lineDirection) -- returns true if point1 is farther along the line than point2
     local vecToPoint1 = point1:subtract(lineStart)
     local vecToPoint2 = point2:subtract(lineStart)
     local dotProduct1 = vecToPoint1:dot(lineDirection)
     local dotProduct2 = vecToPoint2:dot(lineDirection)
     return dotProduct1 >= dotProduct2 
+
 end
 
 function bulletTooFar(me, bulletPosition, bulletTrajectory)
@@ -92,6 +108,17 @@ function purgeBullets(bullets)
             table.remove(bullets, i)
         end    
     end
+end
+
+function checkViablePosition(position, bullets) -- returns true if no intersect with bullet path, false otherwise
+    local changePosition = false
+    for i = 1, #bullets do
+        if intersectionCircle(bullets[i].trajectory, position) then
+            return false
+        end
+    end
+    return true
+end
 
 -- Initialize bot
 function bot_init(me)
@@ -130,7 +157,7 @@ end
 -- Set target to closest visible enemy
 local target = closest_enemy
 if target then
-    local direction = target:pos():sub(me_pos)
+    --local direction = {target:pos():sub(me_pos)}
     -- If target is within melee range and melee attack is not on cooldown, use melee attack
     if min_distance <= 2 and cooldowns[3] == 0 then
         me:cast(2, direction)
@@ -141,8 +168,7 @@ if target then
         me:cast(0, direction)
         cooldowns[1] = 1
     end
-
-    -- Move towards the target
+    -- Move towards the center
+    local direction = {250, 250}
     me:move(direction)
-end
 end

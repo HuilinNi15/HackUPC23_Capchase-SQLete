@@ -12,12 +12,13 @@ function closestN(me, radius, tipus)
 	return ret
 end
 function closest(me, list)
-	local lowestDistance = 0
+	local lowestDistance = math.huge
 	local closer = nil
 	for _, you in ipairs(list) do
 		if vec.distance(me:pos(), you:pos()) <= lowestDistance then
 			lowestDistance = vec.distance(me:pos(), you:pos())
 			closer = you
+			print(closer)
 		end
 	end
 	return closer

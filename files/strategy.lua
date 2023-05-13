@@ -186,38 +186,51 @@ function calc_dir(vec1, vec2)
 end
 
 function calcularDirecciones(tablaAnterior, tablaNueva)
+    if tablaAnterior == {} then
+        return tablaNueva
+    end
     local ret_tabla = {}
+    local dir
     for i, ent in ipairs(tablaNueva) do
         local j = bulletInTable(ent, tablaAnterior)
         if j ~= -1 then
             if tablaAnterior[j]:trajectory() ~= nil then
-                print("1")
-                local dir = tablaAnterior[j]:trajectory()
+                dir = tablaAnterior[j]:trajectory()
             else
-                local dir = calc_dir(tablaAnterior[j], ent:pos())
+                dir = calc_dir(tablaAnterior[j], ent:pos())
             end
         else
-            local dir = nil
-            print("2")
+            dir = nil
         end
         table.insert(ret_tabla, Vec2.new(ent:pos(), dir))
     end
     return ret_tabla
 end
 
+function closest(me, radius, tipus)
+    -- type either "player" or "small_proj"
+    local ret = {}
+
+    for _, you in ipairs(me:visible()) do
+        if you:type() == tipus and vec.distance(me:pos(), you:pos()) <= radius then
+            table.insert(ret, you)
+        end
+    end
+    return ret
+end
+
 -- Initialize bot
 function bot_init(me)
     bullets = calcularDirecciones({}, closest(me, 35, "bullet"))
-    print("init")
+
 end
 
 -- Main bot function
 function bot_main(me)
     local me_pos = me:pos()
-    print("main")
 
     bullets = calcularDirecciones(bullets, closest(me, 35, "bullet"))
-    print("bullets")
+
     -- Update cooldowns
     for i = 1, 3 do
         if cooldowns[i] > 0 then
@@ -248,7 +261,7 @@ function bot_main(me)
     -- Set target to closest visible enemy
     local target = closest_enemy
     if target then
-        local direction = {target:pos()}
+        local direction = target:pos():sub(me:pos())
         -- If target is within melee range and melee attack is not on cooldown, use melee attack
         if min_distance <= 2 and cooldowns[3] == 0 then
             me:cast(2, direction)
@@ -256,19 +269,16 @@ function bot_main(me)
             -- If target is not within melee range and projectile is not on cooldown, use projectile
         elseif cooldowns[1] == 0 then
 
-            me:cast(0, direction)
+            me:cast(0, target:pos():sub(me:pos()))
             cooldowns[1] = 1
         end
         -- Move towards the center
         if checkViablePosition(me, me_pos) then
-            local direction = vec.new(0, 0)
+            direction = vec.new(0, 0)
         else
-            local direction = vec.new(1, 1)
+            direction = vec.new(1, 0)
         end
-        if dist(target, me) > 5 then
-            direction = vec.new(1,1)
-        end
-        me:move(direction)
+        tryMove(me, direction)
     end
 
 end

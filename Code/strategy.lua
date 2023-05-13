@@ -185,7 +185,9 @@ function intersection(line1, line2)
     return Point:new(x, y)
 end
 
-function fartherAlongLine(point1, point2, lineStart, lineDirection) -- returns true if point1 is farther along the line than point2
+
+-- returns true if point1 is farther along the line than point2
+function fartherAlongLine(point1, point2, lineStart, lineDirection) 
     local vecToPoint1 = point1:subtract(lineStart)
     local vecToPoint2 = point2:subtract(lineStart)
     local dotProduct1 = vecToPoint1:dot(lineDirection)
@@ -252,7 +254,7 @@ end
 function tryMove(objectivePosition) --given the objective position, goes there if possible, else the nearest place
     if checkViablePosition do
         me:move(position)
-    else
+    else 
         for i = 1, 360 do
             -- make the rotation matrix
             local angle = math.rad(i) -- rotate one degree to the right

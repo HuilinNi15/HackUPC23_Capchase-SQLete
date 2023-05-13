@@ -19,16 +19,17 @@ end
 
 function calcularDirecciones(tablaAnterior, tablaNueva)
     local ret_tabla = {}
+    local dir
     for i, ent in ipairs(tablaNueva) do
         local j = bulletInTable(ent, tablaAnterior)
         if j ~= -1 then
             if tablaAnterior[j]:trajectory() ~= nil then
-                local dir = tablaAnterior[j]:trajectory()
+                dir = tablaAnterior[j]:trajectory()
             else
-                local dir = calc_dir(tablaAnterior[j], ent:pos())
+                dir = calc_dir(tablaAnterior[j], ent:pos())
             end
         else
-            local dir = nil
+            dir = nil
         end
         table.insert(ret_tabla, Vec2.new(ent:pos(), dir))
     end

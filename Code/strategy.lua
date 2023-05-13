@@ -20,7 +20,7 @@ function vec:add(v)
 end 
 
 function vec:sub(v)
-    return vec:new(v._x - self._x, v._y - self._y)
+    return vec:new(self._x - v._x, self._y - v._y)
 end 
 
 function vec:x()
@@ -176,28 +176,21 @@ function intersection(line1, line2)
     return vec:new(x, y)
 end
 
-function furtherAlongLine(point1, point2, lineStart, lineDirection) -- returns true if point1 is farther along the line than point2
-    local vecToPoint1 = point1:sub(lineStart)
-    local vecToPoint2 = point2:sub(lineStart)
-    local dotProduct1 = vecToPoint1:dot(lineDirection)
-    local dotProduct2 = vecToPoint2:dot(lineDirection)
-    return dotProduct1 >= dotProduct2 
-
+function furtherAlongLine(bullet, intersectionPoint) -- returns true if the bullet is further along the line than the intersection point
+    local aux_vec = bullet:pos():sub(intersectionPoint)
+    
 end
 
 -- Function to check for intersection between a circle and a line
 -- Returns true if there is an intersection, false otherwise
 function intersectionCircle(line, circleCenter)
-    -- Find the distance from the center of the circle to the line
-    local distance = math.abs(line.a * circleCenter.x + line.b * circleCenter.y + line.c) / math.sqrt(line.a * line.a + line.b * line.b)
-  
-    -- If the distance is greater than the radius of the circle, there is no intersection
-    if distance > 1 then
-      return false
+    -- Check the closest point to the circle center
+    local closestPoint = intersection(line, line:perpendicular(circleCenter))
+    if pointDistance(closestPoint, circleCenter) <= 0.5 then
+        return true
+    else
+        return false
     end
-  
-    -- Otherwise, there is an intersection
-    return true
 end
 
 

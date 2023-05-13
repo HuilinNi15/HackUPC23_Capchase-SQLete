@@ -191,12 +191,14 @@ function calcularDirecciones(tablaAnterior, tablaNueva)
         local j = bulletInTable(ent, tablaAnterior)
         if j ~= -1 then
             if tablaAnterior[j]:trajectory() ~= nil then
+                print("1")
                 local dir = tablaAnterior[j]:trajectory()
             else
                 local dir = calc_dir(tablaAnterior[j], ent:pos())
             end
         else
             local dir = nil
+            print("2")
         end
         table.insert(ret_tabla, Vec2.new(ent:pos(), dir))
     end
@@ -221,7 +223,7 @@ function bot_main(me)
     end
 
     -- Attack logic
-    local closest_enemy = me
+    local closest_enemy = nil
     local min_distance = math.huge
     for _, player in ipairs(me:visible()) do
         local dist = vec.distance(me_pos, player:pos())

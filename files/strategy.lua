@@ -221,7 +221,7 @@ function bot_main(me)
     end
 
     -- Attack logic
-    local closest_enemy = nil
+    local closest_enemy = me
     local min_distance = math.huge
     for _, player in ipairs(me:visible()) do
         local dist = vec.distance(me_pos, player:pos())

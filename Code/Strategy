@@ -4,6 +4,17 @@ local cooldowns = {0, 0, 0}
 --Allies
 local allies = {}
 
+Bullet = {}
+
+function Bullet:new(position, trajectory)
+    local obj = {}
+    obj.position = position
+    obj.trajectory = trajectory
+    setmetatable(obj, self)
+    self.__index = self
+    return obj
+end
+
 -- Define a Point class with x and y coordinates
 Point = {}
 function Point:new(x, y)

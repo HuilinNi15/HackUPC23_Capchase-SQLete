@@ -2,7 +2,7 @@
 
 vec = {}
 
-function vec:new(x, y, type)
+function vec.new(x, y, type)
 
         local obj = {
             _x = x,
@@ -15,24 +15,24 @@ function vec:new(x, y, type)
     return obj
 end
 
-function vec:add(v)
-    return vec:new(v._x + self._x, v._y + self._y)
+function vec.add(v)
+    return vec.new(v._x + self._x, v._y + self._y)
 end 
 
-function vec:sub(v)
-    return vec:new(self._x - v._x, self._y - v._y)
+function vec.sub(v)
+    return vec.new(self._x - v._x, self._y - v._y)
 end 
 
-function vec:x()
+function vec.x()
     return self._x
 end 
 
-function vec:y()
+function vec.y()
     return self._y
 end 
 
-function vec:neg()
-    return vec:new(-self._x, -self._y)
+function vec.neg()
+    return vec.new(-self._x, -self._y)
 end 
 
 -- entity CLASS
@@ -57,12 +57,12 @@ end
 
 
 function entity:pos()
-    return vec:new(self._x, self._y)
+    return vec.new(self._x, self._y)
 end
 
 function entity:move(vec)
-    local norm = math.sqrt(vec:x()^2 + vec:y()^2)
-    local unit_vec = {vec:x()/norm, vec:y()/norm}
+    local norm = math.sqrt(vec.x()^2 + vec.y()^2)
+    local unit_vec = {vec.x()/norm, vec.y()/norm}
     self._x = unit_vec[1]
     self._y = unit_vec[2]
 end
@@ -144,7 +144,7 @@ end
 function Vec2:perpendicular(point)
     local dx = self:trajectory():y()
     local dy = -self.trajectory():x()
-    local directionVector = vec:new(dx, dy)
+    local directionVector = vec.new(dx, dy)
     return Vec2:new(point, directionVector)
 end
 
@@ -173,13 +173,13 @@ function intersection(line1, line2)
     local x = x1 + dx1 * t1
     local y = y1 + dy1 * t1
     
-    return vec:new(x, y)
+    return vec.new(x, y)
 end
 
 function furtherAlongLine(bullet, intersectionPoint) -- returns true if the bullet is further along the line than the intersection point
     local aux_vec = bullet:pos():sub(intersectionPoint)
-    local dx = bullet:trajectory():x() / aux_vec:x()
-    local dy = bullet:trajectory():y() / aux_vec:y()
+    local dx = bullet:trajectory():x() / aux_vec.x()
+    local dy = bullet:trajectory():y() / aux_vec.y()
     if dx == dy and dx > 0 then
         return true
     else
@@ -250,7 +250,7 @@ step = 5
 
 function tryMove(me, vector_dir) --given the objective position, goes there if possible, else the nearest place
     local norm_dir_vec = normalize_vector(vector_dir)
-    local objectivePosition = vec.new(me:pos():x() + norm_dir_vec:x()*step, me:pos():y() + norm_dir_vec:y()*step)
+    local objectivePosition = vec.new(me:pos():x() + norm_dir_vec.x()*step, me:pos():y() + norm_dir_vec.y()*step)
     if checkViablePosition() then
         me:move(objectivePosition)
     else
@@ -324,7 +324,7 @@ function bot_main(me)
             cooldowns[1] = 1
         end
         -- Move towards the center
-        local direction = {250, 250}
+        local direction = vec.new(250, 250)
         me:move(direction)
     end
 

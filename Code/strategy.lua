@@ -109,6 +109,7 @@ local target = nil
 local cooldowns = {0, 0, 0}
 --Allies
 local allies = {}
+local bullets = {}
 
 function rotationMatrix(angle)
     local cos = math.cos(angle)
@@ -185,9 +186,7 @@ function intersection(line1, line2)
     return Point:new(x, y)
 end
 
-
--- returns true if point1 is farther along the line than point2
-function fartherAlongLine(point1, point2, lineStart, lineDirection) 
+function fartherAlongLine(point1, point2, lineStart, lineDirection) -- returns true if point1 is farther along the line than point2
     local vecToPoint1 = point1:subtract(lineStart)
     local vecToPoint2 = point2:subtract(lineStart)
     local dotProduct1 = vecToPoint1:dot(lineDirection)
@@ -209,7 +208,7 @@ function intersectionCircle(line, circleCenter)
   
     -- Otherwise, there is an intersection
     return true
-  end
+end
 
 
 function bulletTooFar(me, bulletPosition, bulletTrajectory)
@@ -220,6 +219,7 @@ function bulletTooFar(me, bulletPosition, bulletTrajectory)
         return true
     else
         return false
+    end
 end
 
 function bulletPast(me, bulletPosition, bulletTrajectory)
@@ -230,6 +230,7 @@ function bulletPast(me, bulletPosition, bulletTrajectory)
         return true
     else
         return false
+    end
 end
 
 function purgeBullets()
@@ -251,89 +252,89 @@ function checkViablePosition(position) -- returns true if no intersect with bull
     return true
 end
 
-function tryMove(objectivePosition) --given the objective position, goes there if possible, else the nearest place
-    if checkViablePosition do
-        me:move(position)
-    else 
-        for i = 1, 360 do
-            -- make the rotation matrix
-            local angle = math.rad(i) -- rotate one degree to the right
-            local rotation = rotationMatrix(angle)
-            local v = {objectivePosition:x(), objectivePosition:y()}
-            local rotatedVector = {
-                rotation[1][1] * v[1] + rotation[1][2] * v[2],
-                rotation[2][1] * v[1] + rotation[2][2] * v[2]
-            }
-            if checkViablePosition(rotatedVector) then
-                me:move(rotatedVector)
-                break
-            end
+function normalize_vector(vector)
+    local norm = math.sqrt(vector:x()^2 + vector:y()^2)
+    return vec.new(vector:x()/norm, vector:y()/norm)
+end
 
-            -- same, to the other side
-            local angle = math.rad(-i) -- rotate one degree to the right
-            local rotation = rotationMatrix(angle)
-            local v = {objectivePosition:x(), objectivePosition:y()}
-            local rotated = {
-                rotation[1][1] * v[1] + rotation[1][2] * v[2],3
-                rotation[2][1] * v[1] + rotation[2][2] * v[2]
-            }
-            if checkViablePosition(rotatedVector) then
-                me:move(rotatedVector)
-                break
+step = 5
+
+function tryMove(me, vector_dir) --given the objective position, goes there if possible, else the nearest place
+    local norm_dir_vec = normalize_vector(vector_dir)
+    local objectivePosition = vec.new(me:pos():x() + norm_dir_vec:x()*step, me:pos():y() + norm_dir_vec:y()*step)
+    if checkViablePosition() then
+        me:move(position)
+    else
+        for i = 1, 180, 5 do
+            for j = -1, 1, 2 do
+                -- make the rotation matrix
+                local angle = math.rad(j*i) -- rotate one degree to the right
+                local rotation = rotationMatrix(angle)
+                local rotatedVector = {
+                    rotation[1][1] * norm_dir_vec[1] + rotation[1][2] * norm_dir_vec[2],
+                    rotation[2][1] * norm_dir_vec[1] + rotation[2][2] * norm_dir_vec[2]
+                }
+                if checkViablePosition(rotatedVector) then
+                    me:move(rotatedVector:sub(me:pos()))
+                    break
+                end
             end
         end
     end
-
+end
 
 -- Initialize bot
 function bot_init(me)
-
+    local position
 end
 
 -- Main bot function
 function bot_main(me)
-local me_pos = me:pos()
+    local me_pos = me:pos()
 
--- Update cooldowns
-for i = 1, 3 do
-    if cooldowns[i] > 0 then
-        cooldowns[i] = cooldowns[i] - 1
-    end
-end
 
--- Attack logic
-local closest_enemy = nil
-local min_distance = math.huge
-for _, player in ipairs(me:visible()) do
-    local dist = vec.distance(me_pos, player:pos())
-    if dist < min_distance then
-        min_distance = dist
-        local attack = true
-        for _, ally in ipairs(allies) do
-            if _:visible():id() == ally:visible():id() do
-                attack = false
-            end
+    -- Update cooldowns
+    for i = 1, 3 do
+        if cooldowns[i] > 0 then
+            cooldowns[i] = cooldowns[i] - 1
         end
-        closest_enemy = player
     end
-end
 
--- If enemy is within range, melee, otherwise, projectile
--- Set target to closest visible enemy
-local target = closest_enemy
-if target then
-    local direction = {target:pos()}
-    -- If target is within melee range and melee attack is not on cooldown, use melee attack
-    if min_distance <= 2 and cooldowns[3] == 0 then
-        me:cast(2, direction)
-        cooldowns[3] = 50
-        -- If target is not within melee range and projectile is not on cooldown, use projectile
-    elseif cooldowns[1] == 0 then
-
-        me:cast(0, direction)
-        cooldowns[1] = 1
+    -- Attack logic
+    local closest_enemy = nil
+    local min_distance = math.huge
+    for _, player in ipairs(me:visible()) do
+        local dist = vec.distance(me_pos, player:pos())
+        if dist < min_distance then
+            min_distance = dist
+            local attack = true
+            for _, ally in ipairs(allies) do
+                if _:visible():id() == ally:visible():id() then
+                    attack = false
+                end
+            end
+            closest_enemy = player
+        end
     end
-    -- Move towards the center
-    local direction = {250, 250}
-    me:move(direction)
+
+    -- If enemy is within range, melee, otherwise, projectile
+    -- Set target to closest visible enemy
+    local target = closest_enemy
+    if target then
+        local direction = {target:pos()}
+        -- If target is within melee range and melee attack is not on cooldown, use melee attack
+        if min_distance <= 2 and cooldowns[3] == 0 then
+            me:cast(2, direction)
+            cooldowns[3] = 50
+            -- If target is not within melee range and projectile is not on cooldown, use projectile
+        elseif cooldowns[1] == 0 then
+
+            me:cast(0, direction)
+            cooldowns[1] = 1
+        end
+        -- Move towards the center
+        local direction = {250, 250}
+        me:move(direction)
+    end
+
 end

@@ -112,7 +112,7 @@ function purgeBullets(bullets)
     end
 end
 
-function checkViablePosition(position, bullets) -- returns true if no intersect with bullet path, false otherwise
+function checkViablePosition(position) -- returns true if no intersect with bullet path, false otherwise
     local changePosition = false
     for i = 1, #bullets do
         if intersectionCircle(bullets[i].trajectory, position) then
@@ -121,6 +121,10 @@ function checkViablePosition(position, bullets) -- returns true if no intersect 
     end
     return true
 end
+
+function tryMove(me)
+    if checkViablePosition
+
 
 -- Initialize bot
 function bot_init(me)

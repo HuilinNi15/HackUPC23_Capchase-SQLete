@@ -82,16 +82,11 @@ function entity:type()
 end
 
 function entity:repr()
-	local x = self._x
-	local y = self._y 
-	local type = self._type
-	local health = self._health
-	
 	print(
-		'x:', x, 
-		'y:', y, 
-		'type:', type, 
-		'health:', health
+		'x:', self._x, 
+		'y:', self._y , 
+		'type:', self._type, 
+		'health:', self._health
 	)
 end
 

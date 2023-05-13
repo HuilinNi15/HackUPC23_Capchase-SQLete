@@ -5,6 +5,7 @@ local cooldowns = {0, 0, 0}
 --Allies
 local allies = {}
 local bullets = {}
+local center = vec.new(250, 250)
 
 function rotationMatrix(angle)
     local cos = math.cos(angle)

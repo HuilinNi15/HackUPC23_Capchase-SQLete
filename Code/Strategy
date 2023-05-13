@@ -159,7 +159,7 @@ end
 -- Set target to closest visible enemy
 local target = closest_enemy
 if target then
-    --local direction = {target:pos():sub(me_pos)}
+    local direction = {target:pos()}
     -- If target is within melee range and melee attack is not on cooldown, use melee attack
     if min_distance <= 2 and cooldowns[3] == 0 then
         me:cast(2, direction)

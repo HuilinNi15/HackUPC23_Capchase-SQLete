@@ -230,8 +230,8 @@ function purgeBullets(me)
     end
 end
 
-function checkViablePosition(position) -- returns true if no intersect with bullet path, false otherwise
-    purgeBullets()
+function checkViablePosition(me, position) -- returns true if no intersect with bullet path, false otherwise
+    purgeBullets(me)
     for i = 1, #bullets do
         if intersectionCircle(bullets[i]:trajectory(), position) then
             return false
@@ -250,7 +250,7 @@ step = 5
 function tryMove(me, vector_dir) --given the objective position, goes there if possible, else the nearest place
     local norm_dir_vec = normalize_vector(vector_dir)
     local objectivePosition = vec.new(me:pos():x() + norm_dir_vec:x()*step, me:pos():y() + norm_dir_vec:y()*step)
-    if checkViablePosition() then
+    if checkViablePosition(me, objectivePosition) then
         me:move(objectivePosition)
     else
         for i = 1, 180, 5 do
@@ -262,7 +262,7 @@ function tryMove(me, vector_dir) --given the objective position, goes there if p
                     rotation[1][1] * norm_dir_vec[1] + rotation[1][2] * norm_dir_vec[2],
                     rotation[2][1] * norm_dir_vec[1] + rotation[2][2] * norm_dir_vec[2]
                 }
-                if checkViablePosition(rotatedVector) then
+                if checkViablePosition(me, rotatedVector) then
                     me:move(rotatedVector:sub(me:pos()))
                     break
                 end
@@ -360,10 +360,13 @@ function bot_main(me)
             cooldowns[1] = 1
         end
         -- Move towards the center
-        if checkViablePosition(me_pos) then
+        if checkViablePosition(me, me_pos) then
             local direction = vec.new(0, 0)
         else
             local direction = vec.new(1, 1)
+        end
+        if dist(target, me) > 5 then
+            direction = vec.new(1,1)
         end
         me:move(direction)
     end

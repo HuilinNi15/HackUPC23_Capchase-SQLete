@@ -302,7 +302,7 @@ function bot_main(me)
                     attack = false
                 end
             end
-            if not attack then
+            if attack then
                 closest_enemy = player
             end
         end

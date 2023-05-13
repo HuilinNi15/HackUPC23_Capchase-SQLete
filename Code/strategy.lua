@@ -202,9 +202,9 @@ end
 
 
 function bulletTooFar(me, bulletPosition, bulletTrajectory)
-    mePosition = me:pos()
-    perpendicular = bulletTrajectory:perpendicular(mePosition)
-    intersectionPoint = intersection(bulletTrajectory, perpendicular)
+    local mePosition = me:pos()
+    local perpendicular = bulletTrajectory:perpendicular(mePosition)
+    local intersectionPoint = intersection(bulletTrajectory, perpendicular)
     if pointDistance(bulletPosition, intersectionPoint) < 4 * pointDistance(mePosition, intersectionPoint)  then
         return true
     else
@@ -213,9 +213,9 @@ function bulletTooFar(me, bulletPosition, bulletTrajectory)
 end
 
 function bulletPast(me, bulletPosition, bulletTrajectory)
-    mePosition = me:pos()
-    perpendicular = bulletTrajectory:perpendicular(mePosition)
-    intersectionPoint = intersection(bulletTrajectory, perpendicular)
+    local mePosition = me:pos()
+    local perpendicular = bulletTrajectory:perpendicular(mePosition)
+    local intersectionPoint = intersection(bulletTrajectory, perpendicular)
     if fartherAlongLine(bulletPosition, intersectionPoint) then
         return true
     else

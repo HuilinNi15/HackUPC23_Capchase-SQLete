@@ -13,6 +13,7 @@ function Point:new(x, y)
     return p
 end
 
+-- Calculate the distance between two points
 function pointDistance(p1, p2)
     local dx = p2.x - p1.x
     local dy = p2.y - p1.y
@@ -58,6 +59,15 @@ function intersection(line1, line2)
     return Point:new(x, y)
 end
 
+function fartherAlongLine(point1, point2, lineStart, lineDirection) -- returns true if point1 is farther along the line than point2
+    local vecToPoint1 = point1:subtract(lineStart)
+    local vecToPoint2 = point2:subtract(lineStart)
+    local dotProduct1 = vecToPoint1:dot(lineDirection)
+    local dotProduct2 = vecToPoint2:dot(lineDirection)
+    return dotProduct1 >= dotProduct2 
+
+end
+
 -- Function to check for intersection between a circle and a line
 -- Returns true if there is an intersection, false otherwise
 function intersectionCircle(line, circleCenter)
@@ -72,15 +82,7 @@ function intersectionCircle(line, circleCenter)
     -- Otherwise, there is an intersection
     return true
   end
-  
-function fartherAlongLine(point1, point2, lineStart, lineDirection) -- returns true if point1 is farther along the line than point2
-    local vecToPoint1 = point1:subtract(lineStart)
-    local vecToPoint2 = point2:subtract(lineStart)
-    local dotProduct1 = vecToPoint1:dot(lineDirection)
-    local dotProduct2 = vecToPoint2:dot(lineDirection)
-    return dotProduct1 >= dotProduct2 
 
-end
 
 function bulletTooFar(me, bulletPosition, bulletTrajectory)
     mePosition = me:pos()

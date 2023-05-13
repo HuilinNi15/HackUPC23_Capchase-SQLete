@@ -285,7 +285,7 @@ function bot_main(me)
     end
     -- Move towards the center
         if ticks > 50 and ticks < 400 then
-            me:tryMove(me,center:sub(me:pos()))
+            me:tryMove(me,vec.new(250,250):sub(me:pos()))
         else 
             me:tryMove(me,vec.new(0,0))
         end

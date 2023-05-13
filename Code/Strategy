@@ -1,6 +1,8 @@
 -- Global variables
 local target = nil
 local cooldowns = {0, 0, 0}
+--Allies
+local allies = {}
 
 -- Define a Point class with x and y coordinates
 Point = {}
@@ -107,17 +109,24 @@ for i = 1, 3 do
     end
 end
 
--- Find the closest visible enemy
+-- Attack logic
 local closest_enemy = nil
 local min_distance = math.huge
 for _, player in ipairs(me:visible()) do
     local dist = vec.distance(me_pos, player:pos())
     if dist < min_distance then
         min_distance = dist
+        local attack = true
+        for _, ally in ipairs(allies) do
+            if _:visible():id() == ally:visible():id() do
+                attack = false
+            end
+        end
         closest_enemy = player
     end
 end
 
+-- If enemy is within range, melee, otherwise, projectile
 -- Set target to closest visible enemy
 local target = closest_enemy
 if target then

@@ -4,6 +4,15 @@ local cooldowns = {0, 0, 0}
 --Allies
 local allies = {}
 
+function rotationMatrix(angle)
+    local cos = math.cos(angle)
+    local sin = math.sin(angle)
+    return {
+        {cos, -sin},
+        {sin, cos}
+    }
+end
+
 Bullet = {}
 
 function Bullet:new(position, trajectory)
@@ -115,7 +124,7 @@ function bulletPast(me, bulletPosition, bulletTrajectory)
         return false
 end
 
-function purgeBullets(bullets)
+function purgeBullets()
     for i = 1, #bullets do
         if bulletTooFar(me, bullets[i].position, bullets[i].trajectory) or bulletPast(me, bullets[i].position, bullets[i].trajectory) then
             table.remove(bullets, i)
@@ -124,6 +133,7 @@ function purgeBullets(bullets)
 end
 
 function checkViablePosition(position) -- returns true if no intersect with bullet path, false otherwise
+    purgeBullets()
     local changePosition = false
     for i = 1, #bullets do
         if intersectionCircle(bullets[i].trajectory, position) then
@@ -133,8 +143,14 @@ function checkViablePosition(position) -- returns true if no intersect with bull
     return true
 end
 
-function tryMove(me)
-    if checkViablePosition
+function tryMove(objectivePosition) --given the objective position, goes there if possible, else the nearest place
+    if checkViablePosition do
+        me:move(position)
+    else
+        for i = 1, 360 do
+            if 
+        end
+    end
 
 
 -- Initialize bot

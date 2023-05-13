@@ -178,7 +178,13 @@ end
 
 function furtherAlongLine(bullet, intersectionPoint) -- returns true if the bullet is further along the line than the intersection point
     local aux_vec = bullet:pos():sub(intersectionPoint)
-    
+    local dx = bullet:trajectory():x() / aux_vec:x()
+    local dy = bullet:trajectory():y() / aux_vec:y()
+    if dx == dy and dx > 0 then
+        return true
+    else
+        return false
+    end
 end
 
 -- Function to check for intersection between a circle and a line
@@ -216,7 +222,7 @@ function bulletPast(me, bulletPosition, bulletTrajectory)
     end
 end
 
-function purgeBullets()
+function purgeBullets(me)
     for i = 1, #bullets do
         if bulletTooFar(me, bullets[i].position, bullets[i].trajectory) or bulletPast(me, bullets[i].position, bullets[i].trajectory) then
             table.remove(bullets, i)
@@ -246,7 +252,7 @@ function tryMove(me, vector_dir) --given the objective position, goes there if p
     local norm_dir_vec = normalize_vector(vector_dir)
     local objectivePosition = vec.new(me:pos():x() + norm_dir_vec:x()*step, me:pos():y() + norm_dir_vec:y()*step)
     if checkViablePosition() then
-        me:move(position)
+        me:move(objectivePosition)
     else
         for i = 1, 180, 5 do
             for j = -1, 1, 2 do
@@ -291,12 +297,14 @@ function bot_main(me)
         if dist < min_distance then
             min_distance = dist
             local attack = true
-            for _, ally in ipairs(allies) do
-                if _:visible():id() == ally:visible():id() then
+            for i, ally in ipairs(allies) do
+                if player:id() == ally:id() then
                     attack = false
                 end
             end
-            closest_enemy = player
+            if not attack then
+                closest_enemy = player
+            end
         end
     end
 

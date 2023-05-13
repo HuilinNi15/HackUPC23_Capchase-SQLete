@@ -208,13 +208,16 @@ end
 -- Initialize bot
 function bot_init(me)
     bullets = calcularDirecciones({}, closest(me, 35, "bullet"))
+    print("init")
 end
 
 -- Main bot function
 function bot_main(me)
     local me_pos = me:pos()
+    print("main")
 
     bullets = calcularDirecciones(bullets, closest(me, 35, "bullet"))
+    print("bullets")
     -- Update cooldowns
     for i = 1, 3 do
         if cooldowns[i] > 0 then

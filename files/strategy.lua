@@ -191,12 +191,14 @@ function calcularDirecciones(tablaAnterior, tablaNueva)
         local j = bulletInTable(ent, tablaAnterior)
         if j ~= -1 then
             if tablaAnterior[j]:trajectory() ~= nil then
+                print("1")
                 local dir = tablaAnterior[j]:trajectory()
             else
                 local dir = calc_dir(tablaAnterior[j], ent:pos())
             end
         else
             local dir = nil
+            print("2")
         end
         table.insert(ret_tabla, Vec2.new(ent:pos(), dir))
     end
@@ -206,13 +208,16 @@ end
 -- Initialize bot
 function bot_init(me)
     bullets = calcularDirecciones({}, closest(me, 35, "bullet"))
+    print("init")
 end
 
 -- Main bot function
 function bot_main(me)
     local me_pos = me:pos()
+    print("main")
 
     bullets = calcularDirecciones(bullets, closest(me, 35, "bullet"))
+    print("bullets")
     -- Update cooldowns
     for i = 1, 3 do
         if cooldowns[i] > 0 then
@@ -221,7 +226,7 @@ function bot_main(me)
     end
 
     -- Attack logic
-    local closest_enemy = me
+    local closest_enemy = nil
     local min_distance = math.huge
     for _, player in ipairs(me:visible()) do
         local dist = vec.distance(me_pos, player:pos())

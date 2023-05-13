@@ -281,7 +281,8 @@ function bot_main(me)
             me:cast(0, target:pos():sub(me:pos()))
             cooldowns[1] = 1
         end
-        -- Move towards the center
+    end
+    -- Move towards the center
         if ticks > 50 and ticks < 400 then
             me:tryMove(me,center:sub(me:pos()))
         else 
@@ -299,7 +300,5 @@ function bot_main(me)
         if ticks > 600 and ticks < 750 then 
             me:tryMove(me,center:sub(me:pos()))
         end 
-        
-    end
 
 end

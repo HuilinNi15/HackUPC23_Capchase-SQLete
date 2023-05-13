@@ -120,15 +120,24 @@ function rotationMatrix(angle)
     }
 end
 
-Bullet = {}
+Vec2 = {}
 
-function Bullet:new(position, trajectory)
+function Vec2:new(position, trajectory)
     local obj = {}
     obj.position = position
-    obj.trajectory = trajectory
+    obj._trajectory = trajectory
     setmetatable(obj, self)
     self.__index = self
     return obj
+end
+
+-- hacer que Vec2 se comporte como entity
+function Vec2:pos()
+    return self.position
+end
+
+function  Vec2:trajectory()
+    return self._trajectory
 end
 
 -- Define a Point class with x and y coordinates

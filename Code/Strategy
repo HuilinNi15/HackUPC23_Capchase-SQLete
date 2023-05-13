@@ -2,13 +2,87 @@
 local target = nil
 local cooldowns = {0, 0, 0}
 
+-- Define a Point class with x and y coordinates
+Point = {}
+function Point:new(x, y)
+    local p = {x = x, y = y}
+    setmetatable(p, self)
+    self.__index = self
+    return p
+end
+
+function pointDistance(p1, p2)
+    local dx = p2.x - p1.x
+    local dy = p2.y - p1.y
+    return math.sqrt(dx^2 + dy^2)
+end
+
+
+-- Define a Line class with a point and a direction vector
 Line = {}
-function Line:new(point1, point2)
-    local l = {point1 = point1, point2 = point2}
+function Line:new(point, directionVector)
+    local l = {point = point, directionVector = directionVector}
     setmetatable(l, self)
     self.__index = self
     return l
 end
+
+-- Define a method to calculate the perpendicular line passing through a point
+function Line:perpendicular(point)
+    local dx = self.directionVector.y
+    local dy = -self.directionVector.x
+    local directionVector = Point:new(dx, dy)
+    return Line:new(point, directionVector)
+end
+
+-- Define a method to calculate the intersection point of two lines
+function intersection(line1, line2)
+    local x1, y1 = line1.point.x, line1.point.y
+    local x2, y2 = line2.point.x, line2.point.y
+    local dx1, dy1 = line1.directionVector.x, line1.directionVector.y
+    local dx2, dy2 = line2.directionVector.x, line2.directionVector.y
+    
+    local det = dx1 * dy2 - dx2 * dy1
+    if det == 0 then
+        return nil  -- The lines are parallel
+    end
+    
+    local t1 = (dy2 * (x1 - x2) - dx2 * (y1 - y2)) / det
+    local t2 = (dy1 * (x1 - x2) - dx1 * (y1 - y2)) / det
+    
+    local x = x1 + dx1 * t1
+    local y = y1 + dy1 * t1
+    
+    return Point:new(x, y)
+end
+
+function fartherAlongLine(point1, point2, lineStart, lineDirection) -- returns true if point1 is farther along the line than point2
+    local vecToPoint1 = point1:subtract(lineStart)
+    local vecToPoint2 = point2:subtract(lineStart)
+    local dotProduct1 = vecToPoint1:dot(lineDirection)
+    local dotProduct2 = vecToPoint2:dot(lineDirection)
+    return dotProduct1 >= dotProduct2 
+end
+
+function bulletTooFar(me, bulletPosition, bulletTrajectory)
+    mePosition = me:pos()
+    perpendicular = bulletTrajectory:perpendicular(mePosition)
+    intersectionPoint = intersection(bulletTrajectory, perpendicular)
+    if pointDistance(bulletPosition, intersectionPoint) < 4 * pointDistance(mePosition, intersectionPoint)  then
+        return true
+    else
+        return false
+    end
+
+function bulletPast(me, bulletPosition, bulletTrajectory)
+    mePosition = me:pos()
+    perpendicular = bulletTrajectory:perpendicular(mePosition)
+    intersectionPoint = intersection(bulletTrajectory, perpendicular)
+    if fartherAlongLine(bulletPosition, intersectionPoint) then
+        return true
+    else
+        return false
+    end
 
 function isLeft(a, b, c) -- a, b, c are vec2. Returns true if c is left of line ab, meaning the bullet doesn't affect the player
     return ((b:vec():x() - a:vec():x()) * (c:vec():y() - a:vec():y()) - (b:vec():y() - a:vec():y()) * (c:vec():x() - a:vec():x())) > 0

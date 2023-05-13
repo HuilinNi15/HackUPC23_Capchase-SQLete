@@ -143,7 +143,7 @@ end
 -- Define a method to calculate the perpendicular line passing through a point
 function Vec2:perpendicular(point)
     local dx = self:trajectory():y()
-    local dy = -self.trajectory():x()
+    local dy = -self:trajectory():x()
     local directionVector = vec.new(dx, dy)
     return Vec2:new(point, directionVector)
 end
@@ -224,7 +224,7 @@ end
 
 function purgeBullets(me)
     for i = 1, #bullets do
-        if bulletTooFar(me, bullets[i].position, bullets[i].trajectory) or bulletPast(me, bullets[i].position, bullets[i].trajectory) then
+        if bulletTooFar(me, bullets[i]:pos(), bullets[i]:trajectory()) or bulletPast(me, bullets[i]:pos(), bullets[i]:trajectory()) then
             table.remove(bullets, i)
         end    
     end
@@ -232,9 +232,8 @@ end
 
 function checkViablePosition(position) -- returns true if no intersect with bullet path, false otherwise
     purgeBullets()
-    local changePosition = false
     for i = 1, #bullets do
-        if intersectionCircle(bullets[i].trajectory, position) then
+        if intersectionCircle(bullets[i]:trajectory(), position) then
             return false
         end
     end
@@ -250,7 +249,7 @@ step = 5
 
 function tryMove(me, vector_dir) --given the objective position, goes there if possible, else the nearest place
     local norm_dir_vec = normalize_vector(vector_dir)
-    local objectivePosition = vec.new(me:pos():x() + norm_dir_vec.x()*step, me:pos():y() + norm_dir_vec.y()*step)
+    local objectivePosition = vec.new(me:pos():x() + norm_dir_vec:x()*step, me:pos():y() + norm_dir_vec:y()*step)
     if checkViablePosition() then
         me:move(objectivePosition)
     else
@@ -272,16 +271,53 @@ function tryMove(me, vector_dir) --given the objective position, goes there if p
     end
 end
 
+local tickrate = 30 -- 30 ticks por segundo
+local player_speed = 20
+local bullet_speed = 4*player_speed
+
+function bulletInTable(bullet, table)
+    for i, b in ipairs(table) do
+        local distancia = dist(bullet, b)
+        if distancia > bullet_speed/tickrate - 3 and distancia < bullet_speed/tickrate + 3 then
+            return i
+        end
+    end
+    return -1
+end
+
+function calc_dir(vec1, vec2)
+    local vec_dir = vec:new(vec2:x() - vec1:x(), vec2:y() - vec1:y())
+    return vec_dir
+end
+
+function calcularDirecciones(tablaAnterior, tablaNueva)
+    local ret_tabla = {}
+    for i, ent in ipairs(tablaNueva) do
+        local j = bulletInTable(ent, tablaAnterior)
+        if j ~= -1 then
+            if tablaAnterior[j]:trajectory() ~= nil then
+                local dir = tablaAnterior[j]:trajectory()
+            else
+                local dir = calc_dir(tablaAnterior[j], ent:pos())
+            end
+        else
+            local dir = nil
+        end
+        table.insert(ret_tabla, Vec2.new(ent:pos(), dir))
+    end
+    return ret_tabla
+end
+
 -- Initialize bot
 function bot_init(me)
-    local position
+    bullets = calcularDirecciones({}, closest(me, 35, "bullet"))
 end
 
 -- Main bot function
 function bot_main(me)
     local me_pos = me:pos()
 
-
+    bullets = calcularDirecciones(bullets, closest(me, 35, "bullet"))
     -- Update cooldowns
     for i = 1, 3 do
         if cooldowns[i] > 0 then
@@ -324,7 +360,11 @@ function bot_main(me)
             cooldowns[1] = 1
         end
         -- Move towards the center
-        local direction = vec.new(250, 250)
+        if checkViablePosition(me_pos) then
+            local direction = vec.new(0, 0)
+        else
+            local direction = vec.new(1, 1)
+        end
         me:move(direction)
     end
 

@@ -207,13 +207,22 @@ function calcularDirecciones(tablaAnterior, tablaNueva)
     return ret_tabla
 end
 
-function closest(me, radius, tipus)
-    -- type either "player" or "small_proj"
+function closestN(me, radius, tipus)
     local ret = {}
-
     for _, you in ipairs(me:visible()) do
         if you:type() == tipus and vec.distance(me:pos(), you:pos()) <= radius then
+            
             table.insert(ret, you)
+        end
+    end
+    return ret
+end
+
+function closest(me, tab)
+    local ret = tab[1]
+    for _, ent in ipairs(tab) do
+        if vec.distance(me:pos(), ent:pos()) < vec.distance(me:pos(), ret:pos()) then
+            ret = ent
         end
     end
     return ret
@@ -221,7 +230,7 @@ end
 
 -- Initialize bot
 function bot_init(me)
-    bullets = calcularDirecciones({}, closest(me, 35, "bullet"))
+    bullets = calcularDirecciones({}, closestN(me, 35, "bullet"))
 
 end
 
@@ -229,7 +238,7 @@ end
 function bot_main(me)
     local me_pos = me:pos()
 
-    bullets = calcularDirecciones(bullets, closest(me, 35, "bullet"))
+    bullets = calcularDirecciones(bullets, closestN(me, 35, "bullet"))
 
     -- Update cooldowns
     for i = 1, 3 do
@@ -273,12 +282,24 @@ function bot_main(me)
             cooldowns[1] = 1
         end
         -- Move towards the center
-        if checkViablePosition(me, me_pos) then
-            direction = vec.new(0, 0)
-        else
-            direction = vec.new(1, 0)
+        if ticks > 50 and ticks < 400 then
+            me:tryMove(me,center:sub(me:pos()))
+        else 
+            me:tryMove(me,vec.new(0,0))
         end
-        tryMove(me, direction)
+        if ticks > 400 and ticks < 475 then 
+            me:tryMove(me,vec.new(220, 220):sub(me:pos()))
+        end 
+        if ticks > 475 and ticks < 550 then 
+            me:tryMove(me,center:sub(me:pos()))
+        end 
+        if ticks > 550 and ticks < 600 then 
+            me:tryMove(me,vec.new(260, 260):sub(me:pos()))
+        end 
+        if ticks > 600 and ticks < 750 then 
+            me:tryMove(me,center:sub(me:pos()))
+        end 
+        
     end
 
 end

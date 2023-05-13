@@ -1,0 +1,24 @@
+function bot_init(me)
+end
+
+function closest(me, radius, tipus)
+	-- type either "player" or "bullet"
+	local ret = {}
+
+	for _, you in ipairs(me:visible()) do
+		if you:type() == tipus and vec.distance(me:pos(), you:pos()) <= radius then
+			
+			table.insert(ret, you)
+		end
+	end
+	return ret
+end
+
+-- Main bot function
+function bot_main(me)
+	if #(closest(me, 50, "small_proj")) > 0 then
+        me:move(vec.new(-1, -1))
+    else
+		me:move(vec.new(1, 1))
+	end
+end

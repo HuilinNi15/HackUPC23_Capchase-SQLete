@@ -148,7 +148,31 @@ function tryMove(objectivePosition) --given the objective position, goes there i
         me:move(position)
     else
         for i = 1, 360 do
-            if 
+            -- make the rotation matrix
+            local angle = math.rad(i) -- rotate one degree to the right
+            local rotation = rotationMatrix(angle)
+            local v = {objectivePosition:x(), objectivePosition:y()}
+            local rotatedVector = {
+                rotation[1][1] * v[1] + rotation[1][2] * v[2],
+                rotation[2][1] * v[1] + rotation[2][2] * v[2]
+            }
+            if checkViablePosition(rotatedVector) then
+                me:move(rotatedVector)
+                break
+            end
+
+            -- same, to the other side
+            local angle = math.rad(-i) -- rotate one degree to the right
+            local rotation = rotationMatrix(angle)
+            local v = {objectivePosition:x(), objectivePosition:y()}
+            local rotated = {
+                rotation[1][1] * v[1] + rotation[1][2] * v[2],3
+                rotation[2][1] * v[1] + rotation[2][2] * v[2]
+            }
+            if checkViablePosition(rotatedVector) then
+                me:move(rotatedVector)
+                break
+            end
         end
     end
 
